@@ -10,9 +10,21 @@
   },
   "author": "",
   "license": "ISC",
-  "description": "",
   "dependencies": {
+    "@prisma/client": "^6.13.0",
     "dotenv": "^17.2.1",
-    "express": "^5.1.0"
-  }
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "prisma": "^6.13.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nabina01/personal-book-library.git"
+  },
+  "keywords": [],
+  "bugs": {
+    "url": "https://github.com/nabina01/personal-book-library/issues"
+  },
+  "homepage": "https://github.com/nabina01/personal-book-library#readme",
+  "description": ""
 }
