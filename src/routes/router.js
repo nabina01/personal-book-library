@@ -7,13 +7,11 @@ const router = Router();
 import userRoutes from "./user.route.js";
 import booksRoutes from "./books.routes.js";
 import authorRoutes from './author.routes.js';
-import bookAuthorsRoutes from './books.authors.routes.js'; 
 import genresRoutes from "./genres.route.js";
 
 router.use("/users", userRoutes);
 router.use("/books", booksRoutes);
 router.use("/authors", authorRoutes);
-router.use("/book-authors", bookAuthorsRoutes);
 router.use("/genres", genresRoutes);
 
 export default router;
