@@ -1,22 +1,48 @@
-<!doctype html>
+<!DOCTYPE html>
+<html lang="en">
 
 <head>
-  <title>Login Page</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login – YourApp</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
-<body>
-  <form action="#" method="post">
-    
-      <label for="Email:">Email</label>
-      <input id="email" type="email" placeholder="Enter your email" required>
-      <br>
-      <br>
-      <label for="Password:">Password</label>
-      <input id="password" type="password" placeholder="Enter your password" required>
-        <br>
-        <br>
-        <script src = "html.js"></script>
-      <button type="button" onclick="logindata()">Login</button>
 
-  </form>
+<body>
+  <div class="wrapper">
+    <div class="card">
+      <h1>Welcome back</h1>
+      <p class="sub">Log in to your account</p>
+
+      <form id="loginForm">
+
+          
+        <label>Email
+          <input type="email" id="email" placeholder="Email" required />
+        </label>
+        <br>
+        <label>Password
+          <input type="password" id="password" placeholder="Password" required />
+        </label>
+        <br>
+        <div class="extras">
+          <label class="remember">
+            <input type="checkbox" /> Remember me
+          </label>
+          <a href="#">Forgot password?</a>
+        </div>
+
+        <button type="submit">Log In</button>
+      </form>
+
+      <p class="switch">
+        Don't have an account?
+        <a href="signup.html">Sign up</a>
+      </p>
+    </div>
+  </div>
+
+  <script src="login.js"></script>
 </body>
+
 </html>

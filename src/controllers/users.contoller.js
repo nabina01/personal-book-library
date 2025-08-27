@@ -17,10 +17,15 @@ import { generateToken}  from '../utils/json.js';
 //async function getUsers
 const getAllUsers = async (request, response) => {
     try {
-        const users = await prisma.user.findMany();
+        const {name,email}=request.query;
+        const users = await prisma.user.findMany({
+            where: {
+                ...(name && { name: { contains: name } }),
+                ...(email && { email: { contains: email } })
+            },
+        });
         response.status(200).json(users);
-    }
-    catch (error) {
+    } catch (error) {
         console.log(error);
         response.status(500).json({ error: 'Internal server Error' })
     }
@@ -168,10 +173,10 @@ const loginUser= async(request,response)=>{
         message:"Login Sucessful",
         token:token,
         user:{
-            id:body.id,
-            name: body.name,
-            email: body.email,
-            phone_number: body.phone_Number,
+            id:user.id,
+            name: user.name,
+            email: user.email,
+            phone_number: user.phone_number,
         }
        })
     }
