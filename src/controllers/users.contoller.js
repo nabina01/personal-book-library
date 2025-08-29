@@ -1,7 +1,7 @@
 import { request, response } from 'express';
 import { prisma } from '../utils/prisma-clients.js';
 import { generateToken}  from '../utils/json.js';
-
+import bcrypt from 'bcrypt';
 // const getAllUsers = (request,response)=>{
 //     let  users;
 //       prisma.user.findMany().then(
@@ -15,25 +15,25 @@ import { generateToken}  from '../utils/json.js';
 
 //wrap function with aysnc keyword while creating function with function keyword
 //async function getUsers
-const getAllUsers = async (request, response) => {
+const getAllUsers = async (req, res) => {
     try {
-        const {name,email}=request.query;
+        const {name,email}=req.query;
         const users = await prisma.user.findMany({
             where: {
                 ...(name && { name: { contains: name } }),
                 ...(email && { email: { contains: email } })
             },
         });
-        response.status(200).json(users);
+        res.status(200).json(users);
     } catch (error) {
         console.log(error);
-        response.status(500).json({ error: 'Internal server Error' })
+        res.status(500).json({ error: 'Internal server Error' })
     }
 }
 
-const createUsers = async (request, response) => {
+const createUsers = async (req, res) => {
     try {
-        const body = request.body;
+        const body = req.body;
 
         console.log("creating user",body);
 
@@ -43,25 +43,39 @@ const createUsers = async (request, response) => {
             }
         });
         if (existingUser) {
-            return response.status(409).json({ error: 'Email already exist' });
+            return res.status(409).json({ error: 'Email already exist' });
         }
         
+        const salt = await bcrypt.genSalt(10);
+
+        const hashedpassword = await bcrypt.hash(body.password, salt);
+
 
         const user = await prisma.user.create({
             data: {
                 name: body.name,
                 email: body.email,
                 phone_number: body.phone_Number,
-                password: body.password,
+                password: hashedpassword,
             }
 
-        })
-        response.status(201).json(user);
+        });
+        const {password, ..._user}=user;
+        res.status(201).json(_user);
     } catch (error) {
         console.log(error);
-        response.status(500).json({ error: 'Internal server Error' })
+        res.status(500).json({ error: 'Internal server Error' })
     }
 };
+
+//const hashedpassword =hash (password)
+//hashing is the process of converting plaintext into a fixed-size string of characters, 
+// which is typically a digest that is unique to the input data.
+
+//login
+//userInputHash = hash(body.password)
+//compare(databasePasswordHash, userInputHash)
+
 const getOneUser = async (req, res) => {
     try {
         const userId = req.params.id;
@@ -127,25 +141,25 @@ const updateUser = async (request, response) => {
 
 
 
-const deleteUser = async (request, response) => {
+const deleteUser = async (req, res) => {
     //take id as params
     try {
-        const deleteId = request.params.id;
+        const deleteId = req.params.id;
         const user = await prisma.user.findUnique({
             where: {
                 id: parseInt(deleteId),
             }
         });
-        response.status(204).json(deleteUser);
-        //       response.status(204).send();
+        res.status(204).json(deleteUser);
+        //       res.status(204).send();
     } catch (error) {
         console.log(error);
-        response.status(500).json({ error: 'Internal Server Error' });
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 };
 //wrap the function using try-catch function
 
-const loginUser= async(request,response)=>{
+const loginUser= async(req,res)=>{
     //take email and password from request.body
     //find user using email
     //if user vetyo vane then check password and generate token
@@ -153,23 +167,27 @@ const loginUser= async(request,response)=>{
 
     //use case of token
     try{
-        const body = request.body;
-        const{email,password}=request.body;
+        const body = req.body;
+        const{email,password}=req.body;
         const user = await prisma.user.findUnique({
             where: {
                 email:email
         }
     })
         if(!user){
-            return response.status(401).json({message:"Invalid Credentials"});
+            return res.status(401).json({message:"Invalid Credentials"});
         }
        //if password do not match throw Invalid credentials
-       //we will change this logic
-       if(user.password !== password){
-        return response.status(401).json({message:"Invalid Credentials"});
+       //we will change this logic later after implementing hashing
+
+
+       const  isMatch = await bcrypt.compare(body.password, user.password);
+       if(!isMatch){
+        return res.status(401).json({message:"Invalid Credentials"});
        }
+
        const token = generateToken(user);
-       response.status(200).json({
+       res.status(200).json({
         message:"Login Sucessful",
         token:token,
         user:{

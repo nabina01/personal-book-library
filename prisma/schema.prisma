@@ -56,3 +56,15 @@ model BooksAuthors{
   Books Books @relation(fields: [booksId], references: [id])
   Authors Authors @relation(fields: [authorId], references: [id])
 }
+model UserRead {
+  id           Int      @id @default(autoincrement())
+  userId       Int
+  bookId       Int
+  status       String   @default("Wants to Read")
+  review       String?
+  favorite     Boolean  @default(false)
+  summary      String?
+  currentPage  Int?     @default(0)
+  readingGoal  DateTime?
+  rating       Int?
+}

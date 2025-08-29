@@ -10,7 +10,7 @@ router.post('/login',loginUser);
 router.get('/:id', getOneUser);
 router.delete('/:id', deleteUser);
 router.put('/:id',auth, updateUser);
-router.post('/',auth, createUsers);
+router.post('/', createUsers);
 
 // router.get('/',(request,response)=>{
 //     response.send('hello from user routes!');

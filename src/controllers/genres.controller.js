@@ -1,63 +1,63 @@
 import { prisma } from "../utils/prisma-clients.js";
 
 // Get all genres
-export const getAllGenres = async (request, response) => {
+export const getAllGenres = async (req, res) => {
   try {
-    const genres = await prisma.genre.findMany({
+    const genres = await prisma.genres.findMany({
       include: { books: true }
     });
-    response.json(genres);
+    res.json(genres);
   } catch (error) {
-    response.status(500).json({ error: error.message });
+    res.status(500).json({ error: error.message });
   }
 };
 
 // Get one genre
-export const getGenre = async (request, response) => {
+export const getGenre = async (req, res) => {
   try {
-    const genre = await prisma.genre.findUnique({
-      where: { id: Number(request.params.id) },
+    const genre = await prisma.genres.findUnique({
+      where: { id: Number(req.params.id) },
       include: { books: true }
     });
-    response.json(genre);
+    res.json(genre);
   } catch (error) {
-    response.status(500).json({ error: error.message });
+    res.status(500).json({ error: error.message });
   }
 };
 
 // Create genre
-export const createGenre = async (request, response) => {
+export const createGenre = async (req, res) => {
   try {
-    const genre = await prisma.genre.create({
+    const genre = await prisma.genres.create({
       data: req.body
     });
-    response.json(genre);
+    res.json(genre);
   } catch (error) {
-    response.status(500).json({ error: error.message });
+    res.status(500).json({ error: error.message });
   }
 };
 
 // Update genre
-export const updateGenre = async (request, response) => {
+export const updateGenre = async (req, res) => {
   try {
-    const genre = await prisma.genre.update({
+    const genre = await prisma.genres.update({
       where: { id: Number(req.params.id) },
       data: req.body
     });
-    response.json(genre);
+    res.json(genre);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
 // Delete genre
-export const deleteGenre = async (request, response) => {
+export const deleteGenre = async (req, res) => {
   try {
-    await prisma.genre.delete({
-      where: { id: Number(request.params.id) }
+    await prisma.genres.delete({
+      where: { id: Number(req.params.id) }
     });
     res.json({ message: "Genre deleted" });
   } catch (error) {
-    response.status(500).json({ error: error.message });
+    res.status(500).json({ error: error.message });
   }
 };
