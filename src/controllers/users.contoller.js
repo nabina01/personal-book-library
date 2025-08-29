@@ -2,6 +2,9 @@ import { request, response } from 'express';
 import { prisma } from '../utils/prisma-clients.js';
 import { generateToken}  from '../utils/json.js';
 import bcrypt from 'bcrypt';
+import fs from 'fs';
+import path from 'path';
+const uploadDir = path.join(process.cwd(), 'upload');
 // const getAllUsers = (request,response)=>{
 //     let  users;
 //       prisma.user.findMany().then(
@@ -45,7 +48,21 @@ const createUsers = async (req, res) => {
         if (existingUser) {
             return res.status(409).json({ error: 'Email already exist' });
         }
-        
+        //if folder available:do nothing, if is not available then create the folder
+        if (!fs.existsSync(uploadDir)) {
+            fs.mkdirSync(uploadDir, {recursive:true})
+        }
+        const file = req.files?.profile_picture;
+
+        if(!file){
+          return res.status(400).json({message:'file not received'});
+        }
+        const fileName = `${new Date().toISOString()}_${file.name}`;
+        const fullFilePath = path.join(uploadDir, fileName);
+        const fileUri =`/upload/${fileName}`;
+
+        fs.writeFileSync(fullFilePath, file.data);
+
         const salt = await bcrypt.genSalt(10);
 
         const hashedpassword = await bcrypt.hash(body.password, salt);
@@ -57,6 +74,7 @@ const createUsers = async (req, res) => {
                 email: body.email,
                 phone_number: body.phone_Number,
                 password: hashedpassword,
+                profile_picture: fileUri,
             }
 
         });
