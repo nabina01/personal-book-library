@@ -1,7 +1,7 @@
 //authentication middleware
 
 import { verifyToken } from "../utils/json.js";
-import {prisma} from "../utils/prisma-clients.js"
+import prisma from "../utils/prisma-clients.js"
 
 const auth = async(request,response,next) =>{
     console.log("inside middleware");

@@ -20,6 +20,8 @@ model User {
   password        String
   phone_number    String?
   profile_picture String?
+
+  UserRead UserRead[]
 }
 
 model Books {
@@ -31,8 +33,11 @@ model Books {
   cover_image       String?
   
    genreId          Int?   
+   authorId         Int?
   genre             Genres? @relation(fields: [genreId], references: [id])
   BooksAuthors      BooksAuthors[]
+
+   UserRead UserRead[]
 }
 
 model Authors {
@@ -56,15 +61,27 @@ model BooksAuthors{
   Books Books @relation(fields: [booksId], references: [id])
   Authors Authors @relation(fields: [authorId], references: [id])
 }
+
 model UserRead {
   id           Int      @id @default(autoincrement())
-  userId       Int
-  bookId       Int
-  status       String   @default("Wants to Read")
+  user_id      Int
+  book_id      Int
+  status       String   @default("Want to Read")
   review       String?
   favorite     Boolean  @default(false)
   summary      String?
-  currentPage  Int?     @default(0)
-  readingGoal  DateTime?
+  current_page Int
+  reading_goal DateTime?
   rating       Int?
+
+  user       User   @relation(fields: [user_id], references: [id])
+  book       Books  @relation(fields: [book_id], references: [id])
+  notes      Note[]
+}
+
+model Note {
+  id           Int      @id @default(autoincrement())
+  content      String
+  user_read_id Int
+  userRead     UserRead @relation(fields: [user_read_id], references: [id])
 }

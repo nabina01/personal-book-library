@@ -1,70 +1,94 @@
-import { prisma } from "../utils/prisma-clients.js";
+import prisma from '../utils/prisma-clients.js';
 
-// Get all books
-export const getAllBooks = async (request, response) => {
+// GET all books
+export const getAllBooks = async (req, res) => {
   try {
     const books = await prisma.books.findMany({
-      where: { id: Number(request.params.id) },
       include: {
         genre: true,
-        authors: {
-          include: { author: true }
-        }
+        BooksAuthors: true,
+        UserRead: true
       }
     });
-    response.json(books);
+    res.json(books);
   } catch (error) {
-    response.status(500).json({ error: error.message });
+    res.status(500).json({ error: error.message });
   }
 };
 
-// Get one book
-export const getBook = async (request, response) => {
+// GET a single book by ID
+export const getBookById = async (req, res) => {
+  const bookId = parseInt(req.params.id);
   try {
     const book = await prisma.books.findUnique({
-      where: { id: Number(request.params.id) },
+      where: { id: bookId },
       include: {
         genre: true,
-        authors: { include: { author: true } }
+        BooksAuthors: true,
+        UserRead: true
       }
     });
-    response.json(book);
+    if (!book) return res.status(404).json({ message: 'Book not found' });
+    res.json(book);
   } catch (error) {
-    response.status(500).json({ error: error.message });
+    res.status(500).json({ error: error.message });
   }
 };
 
-// Create book
-export const createBook = async (request, response) => {
+// CREATE a new book
+export const createBook = async (req, res) => {
   try {
+    const { title, pages, published_date, blurb, cover_image, genreId, authorId } = req.body;
+
     const book = await prisma.books.create({
-      data: request.body
+      data: {
+        title,
+        pages: parseInt(pages),                // String -> Int
+        published_date: new Date(published_date), // String -> Date
+        blurb,
+        cover_image: cover_image || null,      // fallback if empty
+        genreId: parseInt(genreId),            // String -> Int
+        authorId: parseInt(authorId)           // String -> Int
+      }
     });
-    response.json(book);
+
+    res.status(201).json(book);
   } catch (error) {
-    response.status(500).json({ error: error.message });
+    console.error(error);
+    res.status(400).json({ error: error.message });
   }
 };
 
-// Update book
-export const updateBook = async (request, response) => {
+// UPDATE a book
+export const updateBook = async (req, res) => {
+  const bookId = parseInt(req.params.id);
+  const { title, pages, published_date, blurb, cover_image, genreId,authorId } = req.body;
   try {
-    const book = await prisma.books.update({
-      where: { id: Number(request.params.id) },
-      data: request.body
+    const updatedBook = await prisma.books.update({
+      where: { id: bookId },
+      data: {
+        title,
+        pages,
+        published_date: published_date ? new Date(published_date) : undefined,
+        blurb,
+        cover_image,
+        genreId,
+        authorId
+      }
     });
-    response.json(book);
+    res.json(updatedBook);
   } catch (error) {
-    response.status(500).json({ error: error.message });
+    res.status(500).json({ error: error.message });
   }
 };
 
-// Delete book
-export const deleteBook = async (request, response) => {
+// DELETE a book
+export const deleteBook = async (req, res) => {
+  const bookId = parseInt(req.params.id);
   try {
-    await prisma.books.delete({ where: { id: Number(request.params.id) } });
-    response.json({ message: "Book deleted" });
+    await prisma.books.delete({ where: { id: bookId } });
+    res.json({ message: 'Book deleted successfully' });
   } catch (error) {
-    response.status(500).json({ error: error.message });
+    res.status(500).json({ error: error.message });
   }
 };

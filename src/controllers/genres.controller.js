@@ -1,4 +1,4 @@
-import { prisma } from "../utils/prisma-clients.js";
+import  prisma  from "../utils/prisma-clients.js";
 
 // Get all genres
 export const getAllGenres = async (req, res) => {
